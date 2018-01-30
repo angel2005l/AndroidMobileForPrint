@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">聚龙仓管家</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="aim_ip">目标IP地址</string>
+    <string name="aim_port">目标端口号</string>
+    <string name="aim_program">目标项目名称</string>
+    <string name="page_width">打印纸宽度</string>
+	<string name="page_height">打印纸高度</string>
+	<string name="page_speed">打印速度</string>
+	<string name="save_config">保存配置信息</string>
+	<string name="exit_config">返回</string>
+	<string name="login_btn">登录</string>
+	<string name="config_btn">设置系统配置</string>
+	<string name="user_id_hint">请输入您的用户名</string>
+	<string name="user_pass_hint">请输入您的密码</string>
+	<string name="login_icon_text">登录界面的图标</string>
+	<string name="sreach_bluetooth">搜索蓝牙设备</string>
+	<string name="print_btn">打印</string>
+	<string name="exit_login_btn">退出登录</string>
+	<string name="user_name_text">用户名</string>
+	<string name="orderno_hint">请输入货品唯一识别码</string>
+</resources>
