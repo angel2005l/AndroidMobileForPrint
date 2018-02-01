@@ -19,7 +19,16 @@ import com.icss.util.ConnUtil;
 import com.icss.util.JsonUtil;
 
 public class UserService {
-
+	/**
+	 * 根据用户信息 与服务器端进行交互
+	 * 
+	 * @param userInfo
+	 * @param context
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
 	public Result<PrmtUser> login(PrmtUser userInfo, Context context)
 			throws URISyntaxException, ClientProtocolException, IOException {
 		Result<PrmtUser> result = null;
@@ -33,21 +42,16 @@ public class UserService {
 			if (entity != null) {
 				String contentString = EntityUtils.toString(entity);
 				o = new JSONObject(contentString);
-				// Log.v("o", o.toString());
 				int status = o.getInt("status");
-				// Log.v("login", status + "");
 				if (status == 0) {
-					// Log.v("loginLog", o.getString("data"));
 					user = JsonUtil.parseJson(o.getString("data"),
 							PrmtUser.class);
-					// Log.v("loginLOG", user.toString());
 				}
 				result = new Result<PrmtUser>(status, o.getString("msg"), user);
 			} else {
 				result = new Result<PrmtUser>(999, "服务器端未响应");
 			}
 		} catch (Exception e) {
-			// Log.v("except", e.getMessage());
 			result = new Result<PrmtUser>(999, "服务器端异常");
 		} finally {
 			ConnUtil.closeConn();

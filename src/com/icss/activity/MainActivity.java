@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		userName = (TextView) findViewById(R.id.userName);
 		blueToothStatus = (TextView) findViewById(R.id.blueToothStatus);
 		printBtn = (Button) findViewById(R.id.printBth);
-		orderEdit  = (EditText) findViewById(R.id.orderEdit);
+		orderEdit = (EditText) findViewById(R.id.orderEdit);
 		findViewById(R.id.blueToothSreach).setOnClickListener(this);
 		orderEdit.setOnKeyListener(this);
 		printBtn.setOnClickListener(this);
@@ -77,59 +77,6 @@ public class MainActivity extends Activity implements OnClickListener,
 		Message message = new Message();
 		message.setData(loginIntent.getBundleExtra("userInfo"));
 		mHandler.sendMessage(message);
-		// orderEdit.setOnKeyListener(new OnKeyListener() {
-		//
-		// @Override
-		// public boolean onKey(View v, int keyCode, KeyEvent event) {
-		// if (keyCode == KeyEvent.KEYCODE_ENTER) {
-		// printBtn.requestFocus();
-		// printBtn.performClick();
-		// return true;
-		// }
-		// return false;
-		// }
-		// });
-
-		// blueToothSreach.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// if (HPRTPrinter != null) {
-		// try {
-		// HPRTPrinterHelper.PortClose();
-		// } catch (Exception e) {
-		// LogUtil.e("【" + TAG + "】" + "初始化蓝牙连接失败"
-		// + e.getMessage());
-		// Toast.makeText(mContext, "初始化蓝牙连接失败",
-		// Toast.LENGTH_SHORT).show();
-		// }
-		// }
-		// boolean isEnable = BluetoothUtil.getInstance().onCreat(
-		// MainActivity.this);
-		// if (isEnable) {
-		// // Log.v("isEnable", isEnable + "");
-		// Intent intentForBluetooth = new Intent(mContext,
-		// BluetoothActivity.class);
-		// startActivityForResult(intentForBluetooth,
-		// HPRTPrinterHelper.ACTIVITY_CONNECT_BT);
-		// } else {
-		// // LogUtil.i("【" + TAG + "】" + "该设备不支持蓝牙");
-		// Toast.makeText(mContext, "该设备不支持蓝牙", Toast.LENGTH_SHORT)
-		// .show();
-		//
-		// }
-		// }
-		// });
-		// exitBtn.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// Intent toExit = new Intent(mContext, LoginActivity.class);
-		// startActivity(toExit);
-		// finish();
-		// }
-		// });
-		// printOnclick(); // 注册点击监听事件
-
 	}
 
 	@Override
@@ -172,9 +119,33 @@ public class MainActivity extends Activity implements OnClickListener,
 				Toast.makeText(getApplicationContext(), "请先连接蓝牙",
 						Toast.LENGTH_SHORT).show();
 			} else {
-				mDialog = DialogUtil.createDialogView(mContext, "打印中...");
-				// 执行查询方法
-				new PrintRun(orderNo).start();
+				try {
+					// 0：打印机准备就绪。
+					// 1：打印机打印中。
+					// 2：打印机缺纸。
+					// 6：打印机开盖。
+					// 其他：出错。
+					switch (HPRTPrinterHelper.getstatus()) {
+					case 0:
+					case 1:
+						mDialog = DialogUtil.createDialogView(mContext,
+								"打印中...");
+						// 执行查询方法
+						new PrintRun(orderNo).start();
+						break;
+					case 2:
+						showResult(false, "打印机缺纸/纸带安装不正确,请安装打印纸...");
+						break;
+					case 6:
+						showResult(false, "打印机开盖,请检查打印机盖子是否关闭...");
+						break;
+					default:
+						showResult(false, "打印机未知错误,请重新连接打印机或重启蓝牙设备...");
+						break;
+					}
+				} catch (Exception e) {
+					LogUtil.e("【" + TAG + "】" + "执行打印操作异常" + e.getMessage());
+				}
 			}
 			break;
 		default:
@@ -244,7 +215,6 @@ public class MainActivity extends Activity implements OnClickListener,
 				try {
 					Bundle data = msg.getData();
 					if (null == data) {
-						// Log.v(TAG, "客户端数据传输异常");
 						isPrint = false;
 						errMsg = "客户端数据传输异常";
 					} else {
@@ -255,16 +225,19 @@ public class MainActivity extends Activity implements OnClickListener,
 							SerializableMap map = (SerializableMap) data
 									.getSerializable("orderData");
 							Map<String, Object> orderInfo = map.getMap();
-							// Log.v("ddddd", orderInfo.toString());
 							List<SysPrintTempletDetail> sptds = (List<SysPrintTempletDetail>) list
 									.get(0);
-							// Log.v("lists", sptds.toString());
 							SPUtil printProfile = new SPUtil(mContext,
 									"printProfiles");
-							isPrint = new PrintUtil(printProfile.getString(
-									"pageHeight", "180"),
+							isPrint = new PrintUtil(
+									printProfile.getString("pageHeight", "180"),
 									printProfile.getString("pageHeight", "75"),
-									"1",printProfile.getString("printSpeed", SharedPreferenceFileConfiguration.DEFAULTPRINTSPEED) , orderInfo, sptds).print();// 用于打印反馈的结果
+									"1",
+									printProfile
+											.getString(
+													"printSpeed",
+													SharedPreferenceFileConfiguration.DEFAULTPRINTSPEED),
+									orderInfo, sptds).print();// 用于打印反馈的结果
 						} else {
 							isPrint = false;
 							errMsg = data.getString("msg");
@@ -281,6 +254,12 @@ public class MainActivity extends Activity implements OnClickListener,
 		}
 	};
 
+	/**
+	 * 用于展示打印时错误，并播放相应声音
+	 * 
+	 * @param isPrint
+	 * @param errMsg
+	 */
 	private void showResult(boolean isPrint, String errMsg) {
 		if (isPrint) {
 			soundUtil.paly(1);
@@ -298,7 +277,6 @@ public class MainActivity extends Activity implements OnClickListener,
 						}
 					});
 		}
-
 	}
 
 	class PrintRun extends Thread {

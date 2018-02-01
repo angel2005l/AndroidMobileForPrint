@@ -25,16 +25,31 @@ import com.icss.util.JsonUtil;
 import com.icss.util.SPUtil;
 
 public class PrintService {
+	/**
+	 * 与服务器进行交互 根据输入框的运单号 与 面单类型设置数据 来获得订单信息 ，打印模板信息
+	 * 
+	 * @param orderNo
+	 * @param context
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 */
 	public Result<Map<String, Object>> getDdoAndSptds(String orderNo,
 			Context context) throws URISyntaxException,
 			ClientProtocolException, IOException {
 		Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		ArrayList<NameValuePair> qparams = new ArrayList<NameValuePair>();
-		SPUtil spUtil = new SPUtil(context, SharedPreferenceFileConfiguration.PRINTFILENAME);
-		
+		SPUtil spUtil = new SPUtil(context,
+				SharedPreferenceFileConfiguration.PRINTFILENAME);
+
 		qparams.add(new BasicNameValuePair("logiNo", orderNo));
-		qparams.add(new BasicNameValuePair("pageWidth", spUtil.getString("pageWidth", SharedPreferenceFileConfiguration.DEFAULTPAGEWIDTH)));
-		qparams.add(new BasicNameValuePair("pageHeight", spUtil.getString("pageHeight", SharedPreferenceFileConfiguration.DEFAULTPAGEHEIGHT)));
+		qparams.add(new BasicNameValuePair("pageWidth", spUtil
+				.getString("pageWidth",
+						SharedPreferenceFileConfiguration.DEFAULTPAGEWIDTH)));
+		qparams.add(new BasicNameValuePair("pageHeight", spUtil.getString(
+				"pageHeight",
+				SharedPreferenceFileConfiguration.DEFAULTPAGEHEIGHT)));
 		HttpEntity entity = ConnUtil.getEntity(context, qparams, "print.json");
 		JSONObject o = null;
 		if (null != entity) {

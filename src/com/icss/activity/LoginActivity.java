@@ -71,7 +71,9 @@ public class LoginActivity extends Activity implements OnClickListener {
 		// });
 
 	}
-
+	/**
+	 *	将页面所有的点击事件归结在一起 ,根据button的id来触发相对应的触发事件
+	 */
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -104,7 +106,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 		}
 
 	}
-
+	
+	/**
+	 * 当与服务器交互后 接收Handler对象 返回服务器的结果  status按icssrf来反馈
+	 * 的状态规则
+	 */
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			int status = msg.getData().getInt("status");
@@ -129,6 +135,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 		};
 	};
 
+	/**
+	 * 开辟子线程 与服务器进行交互
+	 * @author MR.H
+	 *
+	 */
 	public class GetOrderInfo extends Thread {
 		private String userIdStr;
 		private String userPassStr;
@@ -150,7 +161,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 				LogUtil.e("【"+TAG+"】"+"服务器连接异常"+e.getMessage());
 				result = new Result<PrmtUser>(999, "服务器连接异常");
 			}
-			//Log.v("result", result.toString());
 			Bundle bundle = new Bundle();
 			Message message = new Message();
 			int status = result.getStatus();
@@ -165,6 +175,9 @@ public class LoginActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * 当页面跳转时 将账号密码的内容清空，并将焦点置于账号输入栏
+	 */
 	@Override
 	protected void onPause() {
 		super.onPause();

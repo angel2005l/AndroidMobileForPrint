@@ -27,10 +27,12 @@ public class BluetoothUtil {
 		return bluetoothObj;
 	}
 
+	// 获得单例的蓝牙
 	private BluetoothUtil() {
 		this.bluetoothObj = BluetoothAdapter.getDefaultAdapter();
 	}
 
+	// 单例模式
 	public static synchronized BluetoothUtil getInstance() {
 		return SingletonHolder.instance;
 	}
@@ -45,7 +47,8 @@ public class BluetoothUtil {
 			if (!bluetoothObj.isEnabled()) {// 判断蓝牙是否被打开
 				Intent enableIntent = new Intent(
 						BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				activity.startActivityForResult(enableIntent, Activity.RESULT_FIRST_USER);
+				activity.startActivityForResult(enableIntent,
+						Activity.RESULT_FIRST_USER);
 				Intent displayIntent = new Intent(
 						BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				displayIntent.putExtra(
@@ -110,7 +113,7 @@ public class BluetoothUtil {
 		// Log.v("paireDevices", paireDevices.toString());
 		if (paireDevices.size() > 0) {
 			for (BluetoothDevice device : paireDevices) {
-//				Log.v("paireDevice", device.toString());
+				// Log.v("paireDevice", device.toString());
 				data.add(device.getName() + "\n" + device.getAddress());
 				// 记录已匹配过的设备信息
 			}
@@ -120,6 +123,14 @@ public class BluetoothUtil {
 
 	private int status;
 
+	/**
+	 * 获得蓝牙连接
+	 * 
+	 * @param toothAddress
+	 * @param context
+	 * @return
+	 * @throws Exception
+	 */
 	public synchronized int getBluetoothConn(final String toothAddress,
 			final Context context) throws Exception {
 		new Thread(new Runnable() {
@@ -133,7 +144,7 @@ public class BluetoothUtil {
 				}
 				new HPRTPrinterHelper(context,
 						HPRTPrinterHelper.PRINT_NAME_A300);
-				
+
 				try {
 					if (HPRTPrinterHelper.IsOpened()) {
 						HPRTPrinterHelper.PortClose();
@@ -141,7 +152,7 @@ public class BluetoothUtil {
 					status = HPRTPrinterHelper.PortOpen("Bluetooth,"
 							+ toothAddress);
 
-					HPRTPrinterHelper.logcat("portOpen:" + status);
+					// HPRTPrinterHelper.logcat("portOpen:" + status);
 				} catch (Exception e) {
 					// TODO 自动生成的 catch 块
 					e.printStackTrace();
@@ -170,14 +181,6 @@ public class BluetoothUtil {
 		}
 		closeCloseable(writer, socket);
 	}
-
-	// 注册扫描蓝牙的广播
-	// private BroadcastReceiver registerBluetoothScanReceiver(Activity
-	// activity) {
-	// IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-	// activity.registerReceiver(receiver, filter);
-	// return receiver;
-	// }
 
 	private OnFoundUnBondDeviceListener onFoundUnBondDeviceListener;
 	private BufferedWriter writer = null;
